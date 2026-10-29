@@ -17,17 +17,27 @@ import FormatSelector from "./FormatSelector";
 import ExportSettings from "./ExportSettings";
 import ExportOverlay from "./ExportOverlay";
 import DownloadResult from "./DownloadResult";
-import ImageOverlay from "./ImageOverlay"
+import ImageOverlay from "./ImageOverlay";
+import HistoryControls from "./HistoryControls";
+import ProjectPanel, { RecoveryNotice } from "./ProjectPanel";
 import { getPresetById } from "@/lib/presets";
 
 import { cn } from "@/lib/utils";
 import {
-  Layers, Crop, Scissors, RotateCw, Volume2, Type,
-  SlidersHorizontal, Zap, AlertTriangle, Github, Copy
+  Layers,
+  Crop,
+  Scissors,
+  RotateCw,
+  Volume2,
+  Type,
+  SlidersHorizontal,
+  Zap,
+  AlertTriangle,
+  Github,
+  Copy,
 } from "lucide-react";
 import OnboardingTour from "./OnboardingTour";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
-import { loadOverlayState, persistOverlayState } from "@/lib/editorPersistence";
 
 interface SectionProps {
   icon: React.ReactNode;
@@ -38,10 +48,7 @@ interface SectionProps {
 
 function Section({ icon, title, children, delay = 0 }: SectionProps) {
   return (
-    <div
-      className="space-y-3 animate-fade-in"
-      style={{ animationDelay: `${delay}ms` }}
-    >
+    <div className="space-y-3 animate-fade-in" style={{ animationDelay: `${delay}ms` }}>
       <div className="flex items-center gap-2">
         <span className="text-film-500 opacity-80">{icon}</span>
         <h3 className="text-sm font-heading font-bold uppercase tracking-widest text-[var(--muted)]">
@@ -82,8 +89,12 @@ function AccordionSection({
         className="w-full flex items-center justify-between px-3 py-2 text-left hover:bg-[var(--border)] transition-all duration-200 group rounded-lg"
       >
         <div className="flex items-center gap-2">
-          <span className="text-film-500 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-transform duration-200">{icon}</span>
-          <span className="text-sm font-heading font-bold uppercase tracking-widest text-[var(--muted)]">{title}</span>
+          <span className="text-film-500 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-transform duration-200">
+            {icon}
+          </span>
+          <span className="text-sm font-heading font-bold uppercase tracking-widest text-[var(--muted)]">
+            {title}
+          </span>
         </div>
         <svg
           aria-hidden="true"
@@ -91,18 +102,24 @@ function AccordionSection({
           height="12"
           viewBox="0 0 12 12"
           fill="none"
-          className={cn("text-[var(--muted)] transition-transform duration-200", isOpen && "rotate-180")}
+          className={cn(
+            "text-[var(--muted)] transition-transform duration-200",
+            isOpen && "rotate-180"
+          )}
         >
-          <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          <path
+            d="M2 4l4 4 4-4"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
         </svg>
       </button>
 
       <div
         id={`${id}-panel`}
-        className={cn(
-          "transition-all duration-200",
-          isOpen ? "block" : "hidden"
-        )}
+        className={cn("transition-all duration-200", isOpen ? "block" : "hidden")}
       >
         <div className="px-3 pt-3 pb-0">{children}</div>
       </div>
@@ -120,49 +137,92 @@ function Kbd({ children }: { children: React.ReactNode }) {
 }
 
 /** Collapsible panel that lists all keyboard shortcuts. */
-function KeyboardShortcutsPanel() {
+function KeyboardShortcutsPanel({ isMac }: { isMac: boolean }) {
   const [open, setOpen] = useState(false);
+  const mod = isMac ? "⌘" : "Ctrl";
 
   const shortcuts: { keys: React.ReactNode[]; label: string }[] = [
-  {
-    keys: [
-      <Kbd key="ctrl">Ctrl</Kbd>,
-      <span key="plus1" className="text-[var(--muted)] text-xs">+</span>,
-      <Kbd key="shift">Shift</Kbd>,
-      <span key="plus2" className="text-[var(--muted)] text-xs">+</span>,
-      <Kbd key="e">E</Kbd>
-    ],
-    label: "Export video",
-  },
-  {
-    keys: [<Kbd key="m">M</Kbd>],
-    label: "Toggle audio mute",
-  },
-  {
-    keys: [<Kbd key="r">R</Kbd>],
-    label: "Reset all settings",
-  },
-  {
-    keys: [<Kbd key="esc">Esc</Kbd>],
-    label: "Cancel export",
-  },
-  {
-    keys: [<Kbd key="1">1</Kbd>, <span key="dash" className="text-[var(--muted)] text-xs">–</span>, <Kbd key="9">9</Kbd>],
-    label: "Switch preset by index",
-  },
-  {
-    keys: [<Kbd key="question">?</Kbd>],
-    label: "Toggle this panel",
-  },
-  {
-    keys: [<Kbd key="i">I</Kbd>],
-    label: "Set trim in point",
-  },
-  {
-    keys: [<Kbd key="o">O</Kbd>],
-    label: "Set trim out point",
-  },
-];
+    {
+      keys: [
+        <Kbd key="mod">{mod}</Kbd>,
+        <span key="plus" className="text-[var(--muted)] text-xs">
+          +
+        </span>,
+        <Kbd key="z">Z</Kbd>,
+      ],
+      label: "Undo",
+    },
+    {
+      keys: isMac
+        ? [
+            <Kbd key="shift">⇧</Kbd>,
+            <span key="plus1" className="text-[var(--muted)] text-xs">
+              +
+            </span>,
+            <Kbd key="mod">⌘</Kbd>,
+            <span key="plus2" className="text-[var(--muted)] text-xs">
+              +
+            </span>,
+            <Kbd key="z">Z</Kbd>,
+          ]
+        : [
+            <Kbd key="mod">Ctrl</Kbd>,
+            <span key="plus" className="text-[var(--muted)] text-xs">
+              +
+            </span>,
+            <Kbd key="y">Y</Kbd>,
+          ],
+      label: "Redo",
+    },
+    {
+      keys: [
+        <Kbd key="ctrl">Ctrl</Kbd>,
+        <span key="plus1" className="text-[var(--muted)] text-xs">
+          +
+        </span>,
+        <Kbd key="shift">Shift</Kbd>,
+        <span key="plus2" className="text-[var(--muted)] text-xs">
+          +
+        </span>,
+        <Kbd key="e">E</Kbd>,
+      ],
+      label: "Export video",
+    },
+    {
+      keys: [<Kbd key="m">M</Kbd>],
+      label: "Toggle audio mute",
+    },
+    {
+      keys: [<Kbd key="r">R</Kbd>],
+      label: "Reset all settings (undoable)",
+    },
+    {
+      keys: [<Kbd key="esc">Esc</Kbd>],
+      label: "Cancel export",
+    },
+    {
+      keys: [
+        <Kbd key="1">1</Kbd>,
+        <span key="dash" className="text-[var(--muted)] text-xs">
+          –
+        </span>,
+        <Kbd key="9">9</Kbd>,
+      ],
+      label: "Switch preset by index",
+    },
+    {
+      keys: [<Kbd key="question">?</Kbd>],
+      label: "Toggle this panel",
+    },
+    {
+      keys: [<Kbd key="i">I</Kbd>],
+      label: "Set trim in point",
+    },
+    {
+      keys: [<Kbd key="o">O</Kbd>],
+      label: "Set trim out point",
+    },
+  ];
 
   return (
     <div className="rounded-xl animate-fade-in overflow-hidden neo-raised">
@@ -183,9 +243,18 @@ function KeyboardShortcutsPanel() {
           height="12"
           viewBox="0 0 12 12"
           fill="none"
-          className={cn("text-[var(--muted)] transition-transform duration-200", open && "rotate-180")}
+          className={cn(
+            "text-[var(--muted)] transition-transform duration-200",
+            open && "rotate-180"
+          )}
         >
-          <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          <path
+            d="M2 4l4 4 4-4"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
         </svg>
       </button>
 
@@ -208,15 +277,41 @@ function KeyboardShortcutsPanel() {
 
 export default function VideoEditor() {
   const {
-    file, duration, recipe, status, progress,
-    result, error, exportStartedAt, updateRecipe,
-    handleFileSelect, fileError, handleExport, cancelExport, reset, resetSettings,
+    file,
+    duration,
+    recipe,
+    status,
+    progress,
+    result,
+    error,
+    exportStartedAt,
+    updateRecipe,
+    handleFileSelect,
+    fileError,
+    handleExport,
+    cancelExport,
+    reset,
+    resetSettings,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+    recovery,
+    discardRecovery,
+    storageStatus,
+    buildProjectFile,
+    importProjectFile,
+    deleteSavedData,
     videoRef,
     seekTo,
-    overlayFile, setOverlayFile,
-    overlayPosition, setOverlayPosition,
-    overlaySize, setOverlaySize,
-    overlayOpacity, setOverlayOpacity,
+    overlayFile,
+    setOverlayFile,
+    overlayPosition,
+    setOverlayPosition,
+    overlaySize,
+    setOverlaySize,
+    overlayOpacity,
+    setOverlayOpacity,
     recommendedPreset,
     currentTime,
     toggleSound,
@@ -233,24 +328,12 @@ export default function VideoEditor() {
     onToggleShortcutsModal: () => {},
     currentTime,
     duration,
+    undo,
+    redo,
   });
 
   const [copied, setCopied] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
-  const initialOverlayState = useRef({
-    overlayPosition,
-    overlaySize,
-    overlayOpacity,
-  });
-  useEffect(() => {
-    if (!file) return;
-
-    persistOverlayState(localStorage, {
-      overlayPosition,
-      overlaySize,
-      overlayOpacity,
-    });
-  }, [overlayPosition, overlaySize, overlayOpacity, file]);
   const [selectedTextId, setSelectedTextId] = useState<string | null>(null);
   const [openSections, setOpenSections] = useState({
     resize: true,
@@ -260,18 +343,6 @@ export default function VideoEditor() {
     audio: false,
     export: false,
   });
-  useEffect(() => {
-    const restored = loadOverlayState(localStorage, {
-      overlayPosition: initialOverlayState.current.overlayPosition,
-      overlaySize: initialOverlayState.current.overlaySize,
-      overlayOpacity: initialOverlayState.current.overlayOpacity,
-    });
-
-    if (restored.overlayPosition) setOverlayPosition(restored.overlayPosition);
-    if (typeof restored.overlaySize === "number") setOverlaySize(restored.overlaySize);
-    if (typeof restored.overlayOpacity === "number") setOverlayOpacity(restored.overlayOpacity);
-  }, [setOverlayOpacity, setOverlayPosition, setOverlaySize]);
-
   const toggleSection = (key: keyof typeof openSections) =>
     setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
   const downloadRef = useRef<HTMLDivElement>(null);
@@ -288,7 +359,7 @@ export default function VideoEditor() {
 
   const handleCopyLink = () => {
     if (typeof window === "undefined") return;
-    const encoded = btoa(JSON.stringify(recipe));
+    const encoded = encodeURIComponent(JSON.stringify(recipe));
     const url = new URL(window.location.href);
     url.searchParams.set("settings", encoded);
     history.replaceState(null, "", url.toString());
@@ -300,7 +371,6 @@ export default function VideoEditor() {
 
   useEffect(() => {
     if (status === "done" && downloadRef.current) {
-      
       const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       downloadRef.current.scrollIntoView({
         behavior: prefersReducedMotion ? "instant" : "smooth",
@@ -309,11 +379,13 @@ export default function VideoEditor() {
     }
   }, [status]);
 
-
   const isProcessing = status === "loading-engine" || status === "exporting";
   const [isMac, setIsMac] = useState(false);
 
   useEffect(() => {
+    // Genuinely needs an effect: navigator is a browser-only API, unavailable
+    // during SSR/render, so it can't be computed as derived state.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMac(typeof navigator !== "undefined" && /Mac/i.test(navigator.platform));
   }, []);
 
@@ -324,23 +396,19 @@ export default function VideoEditor() {
     return 30;
   }, [duration]);
 
-  const videoSrc = useMemo(
-    () => (file ? URL.createObjectURL(file) : null),
-    [file]
-  );
+  const videoSrc = useMemo(() => (file ? URL.createObjectURL(file) : null), [file]);
 
   const exportSummary = useMemo(() => {
     const preset = getPresetById(recipe.preset);
-    const width = recipe.preset === "custom" ? recipe.customWidth : (preset?.width ?? recipe.customWidth);
-    const height = recipe.preset === "custom" ? recipe.customHeight : (preset?.height ?? recipe.customHeight);
+    const width =
+      recipe.preset === "custom" ? recipe.customWidth : (preset?.width ?? recipe.customWidth);
+    const height =
+      recipe.preset === "custom" ? recipe.customHeight : (preset?.height ?? recipe.customHeight);
 
     const framingLabel = recipe.framing === "fit" ? "Fit" : "Fill";
     const speedLabel = `${recipe.speed}× speed`;
-    const qualityLabel = recipe.quality <= 21
-      ? "High"
-      : recipe.quality <= 25
-      ? "Balanced"
-      : "Small file";
+    const qualityLabel =
+      recipe.quality <= 21 ? "High" : recipe.quality <= 25 ? "Balanced" : "Small file";
 
     return `Exporting to ${width}×${height} ${recipe.format.toUpperCase()} • ${framingLabel} • ${speedLabel} • Quality: ${qualityLabel}`;
   }, [recipe]);
@@ -367,54 +435,70 @@ export default function VideoEditor() {
         {status === "error" && `Export failed: ${error}`}
       </div>
 
-      <div className={cn(
-        "max-w-6xl mx-auto px-4 py-8 pb-6 flex-1 w-full",
-        // Reserve space on mobile so the fixed export bar never covers content.
-        file && "max-lg:pb-28"
-      )}>
+      <div
+        className={cn(
+          "max-w-6xl mx-auto px-4 py-8 pb-6 flex-1 w-full",
+          // Reserve space on mobile so the fixed export bar never covers content.
+          file && "max-lg:pb-28"
+        )}
+      >
         <header className="mb-10 flex flex-col items-center justify-center gap-4 animate-fade-in">
-        <div className="skeu-hang" aria-hidden="false">
-        <span className="skeu-wire skeu-wire-l" aria-hidden="true" />
-        <span className="skeu-wire skeu-wire-r" aria-hidden="true" />
-        <div
-          className="skeu-plate inline-block mx-auto w-fit min-w-min"
-          style={{ padding: 'clamp(0.75rem,3vw,1.25rem) clamp(1rem,5vw,2rem)', boxSizing: 'border-box' }}
-          aria-label="Reframe — video editor"
-        >
-        <h1
-          className="skeu-title font-display leading-none tracking-widest2 text-[var(--text)] break-words text-center transition-all"
-          style={{ fontSize: 'clamp(2rem,10vw,4rem)', viewTransitionName: 'reframe-text' }}
-        >
-          REFRAME
-        </h1>
-        <p
-          className="skeu-well font-heading text-[var(--muted)] uppercase tracking-widest text-center px-3 py-1 mx-auto w-fit"
-          style={{
-            fontSize: 'clamp(0.7rem,2vw,0.875rem)',
-            marginTop: 'clamp(0.25rem,1vw,0.5rem)',
-          }}
-        >
-          Your video, any format
-        </p>
-    <div
-      className="max-w-md mx-auto text-center font-heading font-semibold uppercase tracking-widest text-[var(--muted)] border-t border-[var(--skeu-cut)]"
-      style={{
-        fontSize: 'clamp(0.6rem,1.5vw,0.75rem)',
-        marginTop: 'clamp(0.5rem,2vw,0.75rem)',
-        paddingTop: 'clamp(0.5rem,2vw,0.75rem)',
-      }}
-    >
-      No login. No ads. 100% private - your video never leaves your device.
-    </div>
-  </div>
-  </div>
-    </header>
+          <div
+            className="inline-block rounded-xl border border-[var(--border)] bg-[var(--surface)] shadow-sm border-l-4 border-l-film-600 mx-auto w-fit min-w-min"
+            style={{
+              padding: "clamp(0.75rem,3vw,1.25rem) clamp(1rem,5vw,2rem)",
+              boxSizing: "border-box",
+            }}
+            aria-label="Reframe — video editor"
+          >
+            <h1
+              className="font-display leading-none tracking-widest2 text-[var(--text)] break-words text-center transition-all"
+              style={{ fontSize: "clamp(2rem,10vw,4rem)", viewTransitionName: "reframe-text" }}
+            >
+              REFRAME
+            </h1>
+            <p
+              className="font-heading text-[var(--muted)] uppercase tracking-widest text-center"
+              style={{
+                fontSize: "clamp(0.7rem,2vw,0.875rem)",
+                marginTop: "clamp(0.25rem,1vw,0.5rem)",
+              }}
+            >
+              Your video, any format
+            </p>
+            <div
+              className="flex md:hidden items-center justify-center gap-2 font-heading font-semibold uppercase tracking-widest text-[var(--muted)] border-t border-[var(--border)]"
+              style={{
+                fontSize: "clamp(0.6rem,1.5vw,0.75rem)",
+                marginTop: "clamp(0.5rem,2vw,0.75rem)",
+                paddingTop: "clamp(0.5rem,2vw,0.75rem)",
+              }}
+            >
+              <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-[var(--accent)] inline-block animate-pulse" />
+              No login. No ads. 100% private.
+            </div>
+          </div>
+          <div
+            className="flex flex-wrap justify-center text-center items-center gap-2 text-sm font-heading font-semibold uppercase tracking-widest text-[var(--muted)] pb-1"
+            style={{ justifyContent: "center", textAlign: "center", margin: "0", width: "auto" }}
+          >
+            <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-[var(--accent)] inline-block animate-pulse" />
+            No login. No ads. 100% private - your video never leaves your device.
+          </div>
+        </header>
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-5">
-
           <div className="space-y-4 min-w-0">
+            {!file && recovery && (
+              <RecoveryNotice recovery={recovery} onDiscard={discardRecovery} />
+            )}
             {!file && <PrivacyBanner />}
-            <div className="rounded-xl p-3 neo-raised animate-fade-in">
-              <FileUpload onFileSelect={handleFileSelect} currentFile={file} fileError={fileError} duration={duration} />
+            <div className="bg-[var(--surface)] rounded-xl p-3 border border-[var(--border)] animate-fade-in">
+              <FileUpload
+                onFileSelect={handleFileSelect}
+                currentFile={file}
+                fileError={fileError}
+                duration={duration}
+              />
 
               {!file && (
                 <div className="text-center text-[var(--muted)] py-6">
@@ -455,11 +539,23 @@ export default function VideoEditor() {
               </p>
             )}
             {file && (
-              <div className={cn(
-                "grid grid-cols-1 gap-4",
-                isProcessing && "pointer-events-none opacity-50"
-              )}>
-                <div className="rounded-xl p-5 neo-raised space-y-6">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <HistoryControls
+                  canUndo={canUndo}
+                  canRedo={canRedo}
+                  onUndo={undo}
+                  onRedo={redo}
+                />
+              </div>
+            )}
+            {file && (
+              <div
+                className={cn(
+                  "grid grid-cols-1 gap-4",
+                  isProcessing && "pointer-events-none opacity-50"
+                )}
+              >
+                <div className="bg-[var(--surface)] rounded-xl border border-[var(--border)] p-5 space-y-6">
                   <AccordionSection
                     id="trim"
                     icon={<Scissors size={12} />}
@@ -514,11 +610,7 @@ export default function VideoEditor() {
                   >
                     <AudioSpeedControl recipe={recipe} onChange={updateRecipe} />
                   </AccordionSection>
-                  <Section
-                    icon={<SlidersHorizontal size={12} />}
-                    title="Adjustments"
-                    delay={175}
-                  >
+                  <Section icon={<SlidersHorizontal size={12} />} title="Adjustments" delay={175}>
                     <div className="space-y-5">
                       {/* Brightness */}
                       <div className="space-y-2">
@@ -663,12 +755,15 @@ export default function VideoEditor() {
                 <button
                   type="button"
                   onClick={() => {
-                    navigator.clipboard.writeText(error).then(() => {
-                      setCopied(true);
-                      setTimeout(() => setCopied(false), 2000);
-                    }).catch((err) => {
-                      console.error("Failed to copy error to clipboard:", err);
-                    });
+                    navigator.clipboard
+                      .writeText(error)
+                      .then(() => {
+                        setCopied(true);
+                        setTimeout(() => setCopied(false), 2000);
+                      })
+                      .catch((err) => {
+                        console.error("Failed to copy error to clipboard:", err);
+                      });
                   }}
                   className="px-3 py-1.5 bg-[var(--border)] border border-[var(--border)] rounded-lg text-sm font-semibold hover:opacity-80 transition-colors shrink-0 whitespace-nowrap"
                   aria-label="Copy error message to clipboard"
@@ -689,15 +784,31 @@ export default function VideoEditor() {
 
             {status === "done" && result && (
               <div role="status" className="animate-fade-in" ref={downloadRef}>
-                <DownloadResult result={result} onReset={reset} soundOnCompletion={recipe.soundOnCompletion} onToggleSound={toggleSound} />
+                <DownloadResult
+                  result={result}
+                  onReset={reset}
+                  soundOnCompletion={recipe.soundOnCompletion}
+                  onToggleSound={toggleSound}
+                />
               </div>
             )}
+
+            <ProjectPanel
+              hasFile={!!file}
+              storageStatus={storageStatus}
+              disabled={isProcessing}
+              onBuildProjectFile={buildProjectFile}
+              onImportProject={importProjectFile}
+              onDeleteSavedData={deleteSavedData}
+            />
           </div>
 
-          <div className={cn(
-            "space-y-5 transition-opacity duration-300 sticky top-8 self-start",
-            (isProcessing || !file) && "pointer-events-none opacity-50"
-          )}>
+          <div
+            className={cn(
+              "space-y-5 transition-opacity duration-300 sticky top-8 self-start",
+              (isProcessing || !file) && "pointer-events-none opacity-50"
+            )}
+          >
             {!file && (
               <div className="rounded-xl p-4 neo-raised animate-fade-in">
                 <p className="text-[10px] font-heading font-bold text-film-600 uppercase tracking-widest">
@@ -708,7 +819,10 @@ export default function VideoEditor() {
                 </p>
               </div>
             )}
-            <div className="rounded-xl p-5 neo-raised space-y-6 animate-fade-in" style={{ animationDelay: "50ms" }}>
+            <div
+              className="bg-[var(--surface)] rounded-xl border border-[var(--border)] p-5 space-y-6 animate-fade-in"
+              style={{ animationDelay: "50ms" }}
+            >
               <AccordionSection
                 id="resize"
                 icon={<Layers size={12} />}
@@ -720,7 +834,9 @@ export default function VideoEditor() {
                 {recommendedPreset && (
                   <div className="mb-4 rounded-2xl border border-film-200 bg-film-50 p-3 text-sm text-film-700">
                     <p>
-                      We detected a {recommendedPreset.label.replace(/\s/g, "")} video → Recommended: {(recommendedPreset.platform.split("·")[0] ?? "").trim()} ({recommendedPreset.label.replace(/\s/g, "")})
+                      We detected a {recommendedPreset.label.replace(/\s/g, "")} video →
+                      Recommended: {(recommendedPreset.platform.split("·")[0] ?? "").trim()} (
+                      {recommendedPreset.label.replace(/\s/g, "")})
                     </p>
                   </div>
                 )}
@@ -744,12 +860,12 @@ export default function VideoEditor() {
                   onClick={resetSettings}
                   className="text-sm font-heading font-bold uppercase tracking-widest text-[var(--muted)] hover:text-film-600 transition-all opacity-60 hover:opacity-100"
                 >
-                  Clear saved session
+                  Reset settings
                 </button>
               </div>
             </div>
 
-            <KeyboardShortcutsPanel />
+            <KeyboardShortcutsPanel isMac={isMac} />
 
             {file && (
               <p className="rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-xs text-[var(--muted)] leading-relaxed">
@@ -761,10 +877,10 @@ export default function VideoEditor() {
               id="export-button"
               type="button"
               onClick={handleExport}
-                disabled={!file || isProcessing}
-                aria-label='Export video'
-                aria-disabled={!file || isProcessing ? "true" : undefined}
-                title={!file ? "Upload a video to enable export" : undefined}
+              disabled={!file || isProcessing}
+              aria-label="Export video"
+              aria-disabled={!file || isProcessing ? "true" : undefined}
+              title={!file ? "Upload a video to enable export" : undefined}
               className={cn(
                 // Hidden on mobile — replaced by the fixed bottom bar below.
                 "w-full hidden lg:flex items-center justify-center gap-3 py-5 min-h-[44px] rounded-xl",
@@ -774,7 +890,7 @@ export default function VideoEditor() {
                   : "bg-[var(--border)] text-[var(--muted)] cursor-not-allowed"
               )}
             >
-             <Zap size={20} className={cn(file && !isProcessing && "animate-pulse")} />
+              <Zap size={20} className={cn(file && !isProcessing && "animate-pulse")} />
               {isProcessing ? "PROCESSING" : "EXPORT"}
             </button>
 

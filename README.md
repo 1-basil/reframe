@@ -85,6 +85,8 @@ Reframe is a **browser-based video editor** — everything happens on your devic
 - **Audio Control** — Keep or mute audio independently
 - **Speed Control** — 0.25x to 4x playback speed with smooth audio adjustment
 - **Quality Settings** — CRF slider for quality vs. file size trade-offs
+- **Undo / Redo** — every edit can be undone; a slider drag counts as one step
+- **Project recovery** — edits survive a refresh, and project files (`.reframe.json`) save and reopen your edits without the video. See [docs/PROJECTS.md](docs/PROJECTS.md)
 - **Smooth UX** — Lottie animations, live export progress, instant download
 
 Everything stays on your device. No servers. No tracking. No login.
@@ -95,6 +97,8 @@ Everything stays on your device. No servers. No tracking. No login.
 | Shortcut | Action |
 |----------|--------|
 | Ctrl+Enter / Cmd+Enter | Export video |
+| Ctrl+Z / Cmd+Z | Undo the last edit |
+| Ctrl+Y or Ctrl+Shift+Z / Shift+Cmd+Z | Redo |
 | Space | Play/pause video preview |
 | M | Toggle audio mute |
 | Escape | Cancel export |
@@ -439,7 +443,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide including development 
 
 ## Privacy
 
-Reframe processes all videos **100% client-side**. Your video files are never uploaded to any server. You can even use Reframe offline (after first load). The source code is fully open for inspection.
+Reframe processes all videos **100% client-side**. Your video files are never uploaded to any server. You can even use Reframe offline (after first load). Edit settings and a copy of the open video are kept in your own browser so a refresh doesn't lose work; **Delete saved data** in the editor removes them. The source code is fully open for inspection.
 ---
 
 ## Contributors
@@ -458,6 +462,10 @@ We welcome contributions of all kinds — code, documentation, design, and feedb
 
 Thanks to [Chromatic](https://www.chromatic.com/) for providing the visual testing platform that helps us review UI changes and catch visual regressions.
 
+<a href="https://www.datadoghq.com/"><img src="public/badges/datadog-logo.png" width="153" alt="Datadog" /></a>
+
+Reframe is part of the [Datadog Open Source Program](https://www.datadoghq.com/partners/open-source/). Thank you to [Datadog](https://www.datadoghq.com/) for supporting the project and for the Real User Monitoring that helps us understand FFmpeg.wasm load performance and export reliability.
+
 ---
 
 ## License
@@ -475,3 +483,28 @@ Made with ❤️ for everyone who just wants to edit a video without the hassle.
 </div>
 
 ---
+
+## Troubleshooting
+
+### Installation fails
+- Ensure you're on [Bun](https://bun.sh) (this project uses `bun.lock`, not npm/yarn) with Node.js 20.9+.
+- Run `bun install`.
+- Delete `node_modules` and `bun.lock`, then reinstall if issues persist.
+
+### Environment variables not loading
+- Verify that a `.env.local` file exists (see `.env.example` for the required keys).
+- Restart the development server after making changes — env vars are only read at startup.
+
+## FAQ
+
+### How do I start the project?
+Run:
+
+```bash
+bun install
+bun run dev
+```
+
+### How do I report a bug?
+Please open a GitHub issue with reproduction steps and relevant logs.
+
