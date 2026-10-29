@@ -122,7 +122,7 @@ export default function FileUpload({
 
   // ── File info (shown after upload) ───────────────────
   const FileInfo = () => (
-    <div className="px-4 py-3 bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)]">
+    <div className="px-4 py-3 rounded-[var(--radius)] neo-raised">
       <div className="flex flex-col lg:flex-row lg:items-center gap-3">
         <div className="flex items-start gap-3 flex-1 min-w-0">
           <div className="hidden lg:flex items-center justify-center w-9 h-9 rounded-lg bg-[var(--surface)] border border-[var(--border)] shrink-0">

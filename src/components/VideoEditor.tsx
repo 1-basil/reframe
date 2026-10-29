@@ -165,7 +165,7 @@ function KeyboardShortcutsPanel() {
 ];
 
   return (
-    <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] animate-fade-in overflow-hidden">
+    <div className="rounded-xl animate-fade-in overflow-hidden neo-raised">
       <button
         type="button"
         aria-expanded={open}
@@ -373,19 +373,22 @@ export default function VideoEditor() {
         file && "max-lg:pb-28"
       )}>
         <header className="mb-10 flex flex-col items-center justify-center gap-4 animate-fade-in">
+        <div className="skeu-hang" aria-hidden="false">
+        <span className="skeu-wire skeu-wire-l" aria-hidden="true" />
+        <span className="skeu-wire skeu-wire-r" aria-hidden="true" />
         <div
-          className="inline-block rounded-xl border border-[var(--border)] bg-[var(--surface)] shadow-sm border-l-4 border-l-film-600 mx-auto w-fit min-w-min"
+          className="skeu-plate inline-block mx-auto w-fit min-w-min"
           style={{ padding: 'clamp(0.75rem,3vw,1.25rem) clamp(1rem,5vw,2rem)', boxSizing: 'border-box' }}
           aria-label="Reframe — video editor"
         >
         <h1
-          className="font-display leading-none tracking-widest2 text-[var(--text)] break-words text-center transition-all"
+          className="skeu-title font-display leading-none tracking-widest2 text-[var(--text)] break-words text-center transition-all"
           style={{ fontSize: 'clamp(2rem,10vw,4rem)', viewTransitionName: 'reframe-text' }}
         >
           REFRAME
         </h1>
         <p
-          className="font-heading text-[var(--muted)] uppercase tracking-widest text-center"
+          className="skeu-well font-heading text-[var(--muted)] uppercase tracking-widest text-center px-3 py-1 mx-auto w-fit"
           style={{
             fontSize: 'clamp(0.7rem,2vw,0.875rem)',
             marginTop: 'clamp(0.25rem,1vw,0.5rem)',
@@ -394,30 +397,23 @@ export default function VideoEditor() {
           Your video, any format
         </p>
     <div
-      className="flex md:hidden items-center justify-center gap-2 font-heading font-semibold uppercase tracking-widest text-[var(--muted)] border-t border-[var(--border)]"
+      className="max-w-md mx-auto text-center font-heading font-semibold uppercase tracking-widest text-[var(--muted)] border-t border-[var(--skeu-cut)]"
       style={{
         fontSize: 'clamp(0.6rem,1.5vw,0.75rem)',
         marginTop: 'clamp(0.5rem,2vw,0.75rem)',
         paddingTop: 'clamp(0.5rem,2vw,0.75rem)',
       }}
     >
-      <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-[var(--accent)] inline-block animate-pulse" />
-      No login. No ads. 100% private.
+      No login. No ads. 100% private - your video never leaves your device.
     </div>
-  </div>  
-  <div
-    className="flex flex-wrap justify-center text-center items-center gap-2 text-sm font-heading font-semibold uppercase tracking-widest text-[var(--muted)] pb-1"
-    style={{ justifyContent: 'center', textAlign: 'center', margin: '0', width: 'auto' }}
-  >
-    <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-[var(--accent)] inline-block animate-pulse" />
-    No login. No ads. 100% private - your video never leaves your device.
+  </div>
   </div>
     </header>
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-5">
 
           <div className="space-y-4 min-w-0">
             {!file && <PrivacyBanner />}
-            <div className="bg-[var(--surface)] rounded-xl p-3 border border-[var(--border)] animate-fade-in">
+            <div className="rounded-xl p-3 neo-raised animate-fade-in">
               <FileUpload onFileSelect={handleFileSelect} currentFile={file} fileError={fileError} duration={duration} />
 
               {!file && (
@@ -463,7 +459,7 @@ export default function VideoEditor() {
                 "grid grid-cols-1 gap-4",
                 isProcessing && "pointer-events-none opacity-50"
               )}>
-                <div className="bg-[var(--surface)] rounded-xl border border-[var(--border)] p-5 space-y-6">
+                <div className="rounded-xl p-5 neo-raised space-y-6">
                   <AccordionSection
                     id="trim"
                     icon={<Scissors size={12} />}
@@ -507,7 +503,7 @@ export default function VideoEditor() {
                     />
                   </AccordionSection>
                 </div>
-                <div className="bg-[var(--surface)] rounded-xl border border-[var(--border)] p-5 space-y-6">
+                <div className="rounded-xl p-5 neo-raised space-y-6">
                   <AccordionSection
                     id="audio"
                     icon={<Volume2 size={12} />}
@@ -703,7 +699,7 @@ export default function VideoEditor() {
             (isProcessing || !file) && "pointer-events-none opacity-50"
           )}>
             {!file && (
-              <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4 animate-fade-in">
+              <div className="rounded-xl p-4 neo-raised animate-fade-in">
                 <p className="text-[10px] font-heading font-bold text-film-600 uppercase tracking-widest">
                   Getting Started
                 </p>
@@ -712,7 +708,7 @@ export default function VideoEditor() {
                 </p>
               </div>
             )}
-            <div className="bg-[var(--surface)] rounded-xl border border-[var(--border)] p-5 space-y-6 animate-fade-in" style={{ animationDelay: "50ms" }}>
+            <div className="rounded-xl p-5 neo-raised space-y-6 animate-fade-in" style={{ animationDelay: "50ms" }}>
               <AccordionSection
                 id="resize"
                 icon={<Layers size={12} />}
